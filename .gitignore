@@ -1,0 +1,104 @@
+# FastAPI Specific
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# PyCharm IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.ropeproject
+.mypy_cache/
+.pytest_cache/
+__pycache__/
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Logs
+*.log
+logs/
+
+# Environment variables
+.env
+.env.local
+.env.dev
+.env.prod
+.env.test
+.secrets
+.env.*
+
+# Database
+*.db
+*.sqlite3
+*.sqlite
+migrations/
+
+# Coverage reports
+.coverage
+htmlcov/
+.coverage.*
+,coverage
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Static files (if you have frontend)
+staticfiles/
+mediafiles/
+
+# Docker
+docker-compose.override.yml
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Backup files
+*.bak
+*.backup
+
+# Pytest
+.pytest_cache/
+test-results.xml
+
+# MongoDB (if used)
+data/
+
+# Redis (if used)
+dump.rdb

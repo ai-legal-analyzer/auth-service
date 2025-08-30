@@ -3,7 +3,7 @@ from typing import Annotated, Optional
 import uuid
 
 import jwt
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from sqlalchemy import insert, select
