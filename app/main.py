@@ -15,7 +15,7 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
-# CORS middleware ДО роутеров!
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -24,16 +24,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Роутеры
 app.include_router(auth.router)
 app.include_router(permission.router)
 
-
-@app.on_event("startup")
-async def on_startup():
+# Функция для ручного запуска инициализации БД
+async def initialize_database():
     logger.info("Initializing database...")
     try:
         await init_db()
         logger.info("Database initialized successfully!")
     except Exception as e:
         logger.error(f"Failed to initialize database: {e}")
+        raise
+
+# Оставляем для совместимости, но добавляем ручную инициализацию
+@app.on_event("startup")
+async def on_startup():
+    await initialize_database()

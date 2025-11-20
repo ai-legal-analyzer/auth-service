@@ -28,16 +28,59 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_user(db: Annotated[AsyncSession, Depends(get_db)], create_user: CreateUser):
-    await db.execute(insert(User).values(first_name=create_user.first_name,
-                                         last_name=create_user.last_name,
-                                         username=create_user.username,
-                                         email=create_user.email,
-                                         hashed_password=bcrypt_context.hash(create_user.password)))
+async def create_user(
+        db: Annotated[AsyncSession, Depends(get_db)],
+        create_user: CreateUser
+):
+    # Сначала проверяем существование пользователя
+    existing_user = await db.execute(
+        select(User).where(
+            (User.username == create_user.username) |
+            (User.email == create_user.email)
+        )
+    )
+    existing_user = existing_user.scalar_one_or_none()
+
+    if existing_user:
+        if existing_user.username == create_user.username:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "user_already_exists",
+                        "message": "Пользователь с указанным именем уже существует.",
+                        "target": "username"
+                    }
+                }
+            )
+        elif existing_user.email == create_user.email:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error": {
+                        "code": "user_already_exists",
+                        "message": "Пользователь с указанным email уже зарегистрирован.",
+                        "target": "email"
+                    }
+                }
+            )
+
+    # Создаем пользователя
+    result = await db.execute(
+        insert(User).values(
+            first_name=create_user.first_name,
+            last_name=create_user.last_name,
+            username=create_user.username,
+            email=create_user.email,
+            hashed_password=bcrypt_context.hash(create_user.password)
+        )
+    )
     await db.commit()
+
     return {
         'status_code': status.HTTP_201_CREATED,
-        'transaction': 'Successful'
+        'transaction': 'Successful',
+        'user_id': result.inserted_primary_key[0] if result.inserted_primary_key else None
     }
 
 
@@ -204,6 +247,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Token expired!'
+        )
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Could not validate user'
         )
     except jwt.exceptions:
         raise HTTPException(
